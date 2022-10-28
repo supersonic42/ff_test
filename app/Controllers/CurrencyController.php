@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\App;
 use App\Helpers\RequestHelper;
+use App\Models\CurrencyInfoSrc\CBR;
 use App\Models\CurrencyRate;
 
 class CurrencyController
@@ -14,10 +15,11 @@ class CurrencyController
         $redis = App::getInstance()->getRedis();
         $redis->select($config['redis']['db_default']);
 
-        $currencyRate = new CurrencyRate();
-        $currencyRate->date = (string) RequestHelper::getParam('date');
-        $currencyRate->currIn = (string) RequestHelper::getParam('currIn');
-        $currencyRate->currOut = (string) RequestHelper::getParam('currOut');
+        $currencyRate = new CurrencyRate(new CBR());
+        $currencyRate->dateFrom = (string) RequestHelper::getParam('date');
+        $currencyRate->dateTo = date('Y-m-d', strtotime('-1 day' , strtotime($currencyRate->dateFrom)));
+        $currencyRate->currIn = (string) RequestHelper::getParam('curr_in');
+        $currencyRate->currOut = (string) RequestHelper::getParam('curr_out');
 
         if (!$currencyRate->validate()) {
             RequestHelper::responseJSON([
@@ -28,10 +30,10 @@ class CurrencyController
             $cacheKey = $currencyRate->getCacheKey();
 
             if ($redis->exists($cacheKey)) {
-                $rate = 'cached: ' . $redis->get($cacheKey);
+                $rate = json_decode($redis->get($cacheKey), true);
             } else {
                 $rate = $currencyRate->getRate();
-                $redis->set($cacheKey, $rate, ['nx', 'ex' => 10]);
+                $redis->set($cacheKey, json_encode($rate), ['nx', 'ex' => 1]);
             }
 
             RequestHelper::responseJSON([

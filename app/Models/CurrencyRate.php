@@ -3,18 +3,24 @@
 namespace App\Models;
 
 use App\Helpers\DateHelper;
+use App\Models\CurrencyInfoSrc\Interfaces\RateInterface;
 
 class CurrencyRate
 {
     /**
      * @var string
      */
-    public string $date;
+    public string $dateFrom;
 
     /**
      * @var string
      */
-    public string $currIn;
+    public string $dateTo;
+
+    /**
+     * @var string
+     */
+    public string $currIn = 'RUR';
 
     /**
      * @var string
@@ -27,12 +33,30 @@ class CurrencyRate
     private array $_errors = [];
 
     /**
+     * @var object
+     */
+    private object $_currencyInfoSrc;
+
+    public function __construct(RateInterface $currencyInfoSrc)
+    {
+        $this->_currencyInfoSrc = $currencyInfoSrc;
+    }
+
+    /**
      * @return bool
      */
     public function validate(): bool
     {
-        if (!DateHelper::validateDate($this->date)) {
-            $this->_errors['date'] = 'Неверно указана дата';
+        if (!DateHelper::validateDate($this->dateFrom)) {
+            $this->_errors['dateFrom'] = 'Неверно указана дата начала диапазона';
+        }
+
+        if (!DateHelper::validateDate($this->dateTo)) {
+            $this->_errors['dateTo'] = 'Неверно указана дата конца диапазона';
+        }
+
+        if (!isset($this->_currencyInfoSrc->getCurrencyCodeMap()[$this->currOut])) {
+            $this->_errors['currOut'] = 'Неверно указана валюта конвертации';
         }
 
         return empty($this->_errors);
@@ -51,16 +75,16 @@ class CurrencyRate
      */
     public function getCacheKey(): string
     {
-        return "{$this->date}:{$this->currIn}:{$this->currOut}";
+        return "{$this->dateFrom}:{$this->dateTo}:{$this->currIn}:{$this->currOut}";
     }
 
     /**
      * Получение курса валют
      *
-     * @return float
+     * @return array
      */
-    public function getRate(): float
+    public function getRate(): array
     {
-        return 1.23;
+        return $this->_currencyInfoSrc->getDateRangeRate($this->currIn, $this->currOut, $this->dateFrom, $this->dateTo);
     }
 }
