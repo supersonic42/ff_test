@@ -32,14 +32,34 @@ class CurrencyController
             if ($redis->exists($cacheKey)) {
                 $rate = json_decode($redis->get($cacheKey), true);
             } else {
-                $rate = $currencyRate->getRate();
-                $redis->set($cacheKey, json_encode($rate), ['nx', 'ex' => 1]);
+                try {
+                    $rate = $currencyRate->getRate();
+                } catch (\Exception $e) {
+                    RequestHelper::responseJSON([
+                        'state' => 'error',
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+
+                // Кэширование на 1 месяц
+                $redis->set($cacheKey, json_encode($rate), ['nx', 'ex' => 3600 * 24 * 30]);
             }
 
-            RequestHelper::responseJSON([
+            $data = [
                 'state' => 'ok',
-                'rate' => $rate,
-            ]);
+                'rate' => null,
+                'prevDayRateDiff' => null,
+            ];
+
+            if (!empty($rate[$currencyRate->dateFrom])) {
+                $data['rate'] = $rate[$currencyRate->dateFrom];
+
+                if (!empty($rate[$currencyRate->dateTo])) {
+                    $data['prevDayRateDiff'] = round($rate[$currencyRate->dateFrom] - $rate[$currencyRate->dateTo], 4);
+                }
+            }
+
+            RequestHelper::responseJSON($data);
         }
     }
 }

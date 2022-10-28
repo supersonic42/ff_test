@@ -3,11 +3,11 @@
 namespace App;
 
 class App {
-    private static $instance = null;
+    private static ?App $instance = null;
 
-    private $config = null;
-    private $redis = null;
-    private $rootDir = null;
+    private mixed $config = null;
+    private ?\Redis $redis = null;
+    private string $rootDir;
 
     private function __construct()
     {

@@ -82,9 +82,16 @@ class CurrencyRate
      * Получение курса валют
      *
      * @return array
+     * @throws \Exception
      */
     public function getRate(): array
     {
-        return $this->_currencyInfoSrc->getDateRangeRate($this->currIn, $this->currOut, $this->dateFrom, $this->dateTo);
+        $rate = $this->_currencyInfoSrc->getDateRangeRate($this->currIn, $this->currOut, $this->dateFrom, $this->dateTo);
+
+        if ($rate === false) {
+            throw new \Exception('Ошибка получения курса валют');
+        }
+
+        return $rate;
     }
 }

@@ -2,16 +2,51 @@
 
 namespace App\Models\CurrencyInfoSrc;
 
+use App\Helpers\RequestHelper;
 use App\Models\CurrencyInfoSrc\Interfaces\RateInterface;
 
 class CBR implements RateInterface
 {
-    public function getDateRangeRate(string $currIn, string $currOut, string $dateFrom, string $dateTo): array
+    private string $baseUrl = 'http://www.cbr.ru/scripts/XML_dynamic.asp';
+
+    /**
+     * Получение курсов валют из внешнего сервиса
+     *
+     * @todo: Сделать конвертацию между валютам, пока RUR по дефолту
+     *
+     * @param string $currIn
+     * @param string $currOut
+     * @param string $dateFrom
+     * @param string $dateTo
+     *
+     * @return bool|array
+     * @throws \Exception
+     */
+    public function getDateRangeRate(string $currIn, string $currOut, string $dateFrom, string $dateTo): bool|array
     {
-        return [
-            $dateFrom => 2.34,
-            $dateTo => 3.55,
-        ];
+        $dateFromObj = new \DateTime($dateFrom);
+        $dateToObj = new \DateTime($dateTo);
+
+        $res = RequestHelper::sendCurl($this->baseUrl, [
+            'date_req1' => $dateToObj->format('d/m/Y'),
+            'date_req2' => $dateFromObj->format('d/m/Y'),
+            'VAL_NM_RQ' => $this->getCurrencyCodeMap()[$currOut],
+        ], 'get', [], [], false);
+
+        if ($res['httpCode'] != 200) {
+            return false;
+        }
+
+        $data = [];
+        $document = new \SimpleXMLElement($res['result']);
+
+        foreach ($document->Record as $v) {
+            $key = date('Y-m-d', strtotime($v->attributes()['Date']->__toString()));
+            $value = str_replace(',', '.', $v->Value->__toString());
+            $data[$key] = $value;
+        }
+
+        return $data;
     }
 
     public function getCurrencyCodeMap(): array
