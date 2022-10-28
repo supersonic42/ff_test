@@ -1,0 +1,21 @@
+{
+    "name": "totum/ff_test",
+    "description": "Freedom Finance test",
+    "type": "project",
+    "require": {
+        "bramus/router": "1.6"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Anton Sanakoev",
+            "email": "totum42@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
