@@ -11,4 +11,10 @@ if ($appConfig['env'] == 'dev') {
     ini_set('display_errors', 1);
 }
 
-echo 'Hello, World!';
+$router = new \Bramus\Router\Router();
+$router->setNamespace('\App\Controllers');
+
+// Route #1: Get currency rate
+$router->get('/currency-rate', 'CurrencyController@getRate');
+
+$router->run();

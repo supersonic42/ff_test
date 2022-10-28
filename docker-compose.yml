@@ -1,0 +1,31 @@
+services:
+    web:
+        image: tangramor/nginx-php8-fpm
+        environment:
+            WEBROOT: '/var/www/html/public'
+            PHP_REDIS_SESSION_HOST: 'redis'
+        ports:
+            - '80:80'
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - redis
+        hostname: fftest.loc
+    redis:
+        image: 'redis:alpine'
+        volumes:
+            - 'sail-redis:/data'
+        networks:
+            - sail
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            retries: 3
+            timeout: 5s
+networks:
+    sail:
+        driver: bridge
+volumes:
+    sail-redis:
+        driver: local
