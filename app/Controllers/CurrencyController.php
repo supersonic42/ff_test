@@ -18,9 +18,12 @@ class CurrencyController
         $currencyRate = new CurrencyRate(new CBR());
         $currencyRate->dateFrom = (string) RequestHelper::getParam('date');
         $currencyRate->dateTo = date('Y-m-d', strtotime('-1 day' , strtotime($currencyRate->dateFrom)));
-        $currencyRate->currIn = (string) RequestHelper::getParam('curr_in');
         $currencyRate->currOut = (string) RequestHelper::getParam('curr_out');
 
+        if (!empty($currIn = RequestHelper::getParam('curr_in'))) {
+            $currencyRate->currIn = (string) $currIn;
+        }
+        
         if (!$currencyRate->validate()) {
             RequestHelper::responseJSON([
                 'state' => 'error',
