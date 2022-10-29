@@ -65,6 +65,10 @@ class CurrencyRate
             $this->_errors['currOut'] = 'OUT currency is not valid';
         }
 
+        if ($this->currIn == $this->currOut) {
+            $this->_errors['currInOut'] = 'IN and OUT currencies cannot be equal';
+        }
+
         return empty($this->_errors);
     }
 

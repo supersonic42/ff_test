@@ -35,9 +35,18 @@ class CBR implements RateInterface
                 return false;
             }
 
-            foreach ($data1 as $date => $rate) {
-                if (isset($data2[$date])) {
-                    $data[$date] = round($rate / $data2[$date], 4);
+            /**
+             * Exception for RUR, because CBR has no functionality to convert currencies to RUR
+             */
+            if ($currOut == 'RUR') {
+                foreach ($data2 as $date => $rate) {
+                    $data[$date] = round(1 / $rate, 4);
+                }
+            } else {
+                foreach ($data1 as $date => $rate) {
+                    if (isset($data2[$date])) {
+                        $data[$date] = round($rate / $data2[$date], 4);
+                    }
                 }
             }
         } else {
