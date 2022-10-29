@@ -5,7 +5,7 @@ namespace App\Helpers;
 class RequestHelper
 {
     /**
-     * Возвращает GET-параметр
+     * Returns GET parameter
      *
      * @param string $paramName
      *
@@ -17,7 +17,7 @@ class RequestHelper
     }
 
     /**
-     * Возвращает POST-параметр
+     * Returns POST parameter
      *
      * @param string $paramName
      *
@@ -29,7 +29,7 @@ class RequestHelper
     }
 
     /**
-     * Возвращает GET или POST параметр
+     * Returns GET or POST parameter
      *
      * @param string $paramName
      *
@@ -41,7 +41,7 @@ class RequestHelper
     }
 
     /**
-     * Вернуть ответ в формате JSON
+     * Echoes response in JSON format
      *
      * @param array $data
      *
@@ -55,7 +55,7 @@ class RequestHelper
     }
 
     /**
-     * Отправка запроса через CURL
+     * Sends CURL request
      *
      * @param string $url
      * @param array $data

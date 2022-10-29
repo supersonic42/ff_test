@@ -5,7 +5,7 @@ namespace App\Helpers;
 class DateHelper
 {
     /**
-     * Валидация даты
+     * Date validation
      *
      * @param string $date
      * @param string $format

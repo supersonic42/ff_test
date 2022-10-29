@@ -10,17 +10,7 @@ class CBR implements RateInterface
     private string $baseUrl = 'http://www.cbr.ru/scripts/XML_dynamic.asp';
 
     /**
-     * Получение курсов валют из внешнего сервиса
-     *
-     * @todo: Сделать конвертацию между валютам, пока RUR по дефолту
-     *
-     * @param string $currIn
-     * @param string $currOut
-     * @param string $dateFrom
-     * @param string $dateTo
-     *
-     * @return bool|array
-     * @throws \Exception
+     * {@inheritDoc}
      */
     public function getDateRangeRate(string $currIn, string $currOut, string $dateFrom, string $dateTo): bool|array
     {
@@ -49,6 +39,9 @@ class CBR implements RateInterface
         return $data;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getCurrencyCodeMap(): array
     {
         return [

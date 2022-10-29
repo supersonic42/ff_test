@@ -41,7 +41,9 @@ class CurrencyController
                     ]);
                 }
 
-                // Кэширование на 1 месяц
+                /**
+                 * Cache for 1 month
+                 */
                 $redis->set($cacheKey, json_encode($rate), ['nx', 'ex' => 3600 * 24 * 30]);
             }
 

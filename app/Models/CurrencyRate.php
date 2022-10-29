@@ -48,15 +48,21 @@ class CurrencyRate
     public function validate(): bool
     {
         if (!DateHelper::validateDate($this->dateFrom)) {
-            $this->_errors['dateFrom'] = 'Неверно указана дата начала диапазона';
+            $this->_errors['dateFrom'] = 'Start date is not valid';
         }
 
         if (!DateHelper::validateDate($this->dateTo)) {
-            $this->_errors['dateTo'] = 'Неверно указана дата конца диапазона';
+            $this->_errors['dateTo'] = 'End date is not valid';
         }
 
-        if (!isset($this->_currencyInfoSrc->getCurrencyCodeMap()[$this->currOut])) {
-            $this->_errors['currOut'] = 'Неверно указана валюта конвертации';
+        $currencyCodeMap = $this->_currencyInfoSrc->getCurrencyCodeMap();
+
+        if (!isset($currencyCodeMap[$this->currIn])) {
+            $this->_errors['currIn'] = 'IN currency is not valid';
+        }
+
+        if (!isset($currencyCodeMap[$this->currOut])) {
+            $this->_errors['currOut'] = 'OUT currency is not valid';
         }
 
         return empty($this->_errors);
@@ -79,7 +85,7 @@ class CurrencyRate
     }
 
     /**
-     * Получение курса валют
+     * Gets currency rate from external source
      *
      * @return array
      * @throws \Exception
@@ -89,7 +95,7 @@ class CurrencyRate
         $rate = $this->_currencyInfoSrc->getDateRangeRate($this->currIn, $this->currOut, $this->dateFrom, $this->dateTo);
 
         if ($rate === false) {
-            throw new \Exception('Ошибка получения курса валют');
+            throw new \Exception('Error getting currency rate');
         }
 
         return $rate;
